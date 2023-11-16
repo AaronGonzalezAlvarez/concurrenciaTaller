@@ -2,19 +2,14 @@ package concurrenciaTaller;
 
 public class AutomataRobot extends Thread{
 	
-	private TallerSynchronized taller;
+	private Taller taller;
 	
-	public AutomataRobot(TallerSynchronized taller) {
+	public AutomataRobot(Taller taller) {
 		this.taller = taller;
 	}
 	
 	public void run() {
-			try {
-				taller.robotMontacargas();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}	
+			taller.robotMontacargas();	
 	}
 
 }

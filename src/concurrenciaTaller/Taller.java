@@ -15,47 +15,41 @@ public class Taller {
     private Semaphore revisionGeneral = new Semaphore(5);
     private Semaphore cogerAceite = new Semaphore(1);
     private Semaphore robot = new Semaphore(1);
+    private Semaphore esperarColaAceiteCambio = new Semaphore(0);
+    private Semaphore esperarColaRevisionCoche = new Semaphore(0);
     private Random rand = new Random();
     private AtomicInteger aceite = new AtomicInteger(0);
-    int consumoTotal = 2;
+    int consumoTotalCuandoSeCambia = 5;
 
 	public void vehiculo(int i) throws InterruptedException {
-		boolean adquirido = false;
-		while (!adquirido) {
-			if (!cambioAceite.tryAcquire()) {
+		while (!cambioAceite.tryAcquire()) {
 				System.out.println("Esperando el cambio de aceite del coche " + i);
-				Thread.sleep((1 + rand.nextInt(2)) * 1000);
-			} else {
-				adquirido = true;
-			}
+				//Thread.sleep((1 + rand.nextInt(2)) * 1000);
+				esperarColaAceiteCambio.acquire();
 		}
 		cambiarAceite(i);
 		cambioAceite.release();
-		adquirido = false;
-		while (!adquirido) {
-			if (!revisionGeneral.tryAcquire()) {
+		esperarColaAceiteCambio.release();
+		while (!revisionGeneral.tryAcquire()) {
 				System.out.println("Esperando a la revision general coche " + i);
-				Thread.sleep((1 + rand.nextInt(2)) * 1000);
-			} else {
-				adquirido = true;
-			}
+				esperarColaRevisionCoche.acquire();
 		}
-		cambioAceite.release();
 		revisionGeneral(i);
 		System.out.println("ME voy del taller el coche : " + i);
 		revisionGeneral.release();
+		esperarColaRevisionCoche.release();
 	}
 	
 	public void cambiarAceite(int i) throws InterruptedException {
 		cogerAceite.acquire();
-		while(aceite.get() == consumoTotal) {
-			System.err.println("no hay aceite, el coche "+ i + "llamaa la robot");
+		while(aceite.get() == consumoTotalCuandoSeCambia) {
+			System.out.println("no hay aceite, el coche "+ i + "llamaa la robot");
 			robot.acquire();
 		}
 		aceite.incrementAndGet();
-		cogerAceite.release();
 		System.out.println("cambiando el aceite: " +i + " y el consumo total de aceite es :" + aceite.get());
 		Thread.sleep((1 + rand.nextInt(2)) * 1000);
+		cogerAceite.release();
 
 	}
 
@@ -69,7 +63,7 @@ public class Taller {
 		while (true) {
 			if(robot.availablePermits() ==0) {
 				reponerBidones();
-				System.err.println("CAmbio realizado");
+				System.out.println("CAmbio realizado");
 				robot.release();
 			}
 		}

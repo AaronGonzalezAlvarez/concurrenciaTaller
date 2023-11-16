@@ -5,9 +5,9 @@ public class ConcurrenciaTaller {
 	public static void main(String[] args) {
 
 		AceiteTaller estados = new AceiteTaller();
-		//Taller taller = new Taller(estados);
+		Taller taller = new Taller(estados);
 		//TallerLock taller = new TallerLock(estados);
-		TallerSynchronized taller = new TallerSynchronized(estados);
+		//TallerSynchronized taller = new TallerSynchronized(estados);
 		AutomataRobot robot = new AutomataRobot(taller);
 		robot.start();
 		

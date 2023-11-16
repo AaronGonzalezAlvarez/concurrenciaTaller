@@ -4,11 +4,11 @@ import java.util.Random;
 
 public class Cliente extends Thread {
 
-	private TallerSynchronized taller;
+	private Taller taller;
 	private int num;
 
 	private Random rand = new Random();
-	public Cliente(TallerSynchronized taller, int num) {
+	public Cliente(Taller taller, int num) {
 		this.taller = taller;
 		this.num = num;
 	}
